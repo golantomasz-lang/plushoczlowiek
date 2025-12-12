@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kalkulator gigabajtów z abonamentu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --accent: #8fe000;
+      --accent-dark: #5bb200;
+      --bg: #0e1019;
+      --panel: #161829;
+      --text: #f7f7ff;
+      --muted: #a7adc5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #262742 0, #050510 55%);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      padding: 24px 12px;
+    }
+
+    main {
+      width: 100%;
+      max-width: 520px;
+      background: linear-gradient(145deg, #1b1d2a, #111222);
+      border-radius: 24px;
+      padding: 24px 20px 22px;
+      border: 1px solid rgba(143, 224, 0, 0.28);
+      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+
+    .row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 9px 12px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(3, 4, 10, 0.85);
+      color: var(--text);
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.35); }
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(143, 224, 0, 0.7);
+      background: rgba(8, 10, 24, 0.95);
+    }
+
+    .suffix { color: var(--muted); font-size: 14px; padding-right: 4px; }
+
+    button {
+      width: 100%;
+      display: inline-flex;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(143, 224, 0, 0.4);
+      background: linear-gradient(120deg, var(--accent), var(--accent-dark));
+      color: #0d0f16;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.1s ease, filter 0.15s ease;
+    }
+
+    button:hover { filter: brightness(0.96); }
+    button:active { transform: translateY(1px); }
+
+    .result { font-size: 18px; margin: 14px 0 6px; }
+    .result span { font-weight: 700; color: var(--accent); }
+
+    .hint {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .formula {
+      margin: 8px 0 0;
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px dashed rgba(143, 224, 0, 0.35);
+    }
+
+    @media (max-width: 480px) {
+      main { padding: 20px 16px 18px; border-radius: 20px; }
+      h1 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Kalkulator GB z abonamentu</h1>
+    <p class="subtitle">Wpisz kwotę brutto abonamentu komórkowego, a kalkulator policzy szacunkową liczbę gigabajtów według wzoru UE.</p>
+
+    <label for="price">Cena abonamentu</label>
+    <div class="row">
+      <input id="price" type="text" inputmode="decimal" placeholder="np. 24,00" />
+      <div class="suffix">zł/mies.</div>
+    </div>
+
+    <button id="calcBtn" type="button">Przelicz na GB <span aria-hidden="true">🐻</span></button>
+
+    <p class="result">Liczba GB: <span id="gbValue">–</span></p>
+    <p class="hint" id="hint">Podaj kwotę abonamentu, aby zobaczyć wynik.</p>
+
+    <p class="formula" aria-label="Wzór obliczeniowy">
+      Wzór: GB = cena / (4,20196666666667 × 1,1) × 1/1,23 × 2 × 1000 / 1024
+    </p>
+  </main>
+
+  <script>
+    const priceField = document.getElementById("price");
+    const gbField = document.getElementById("gbValue");
+    const hint = document.getElementById("hint");
+
+    function policzGB() {
+      const raw = priceField.value.trim();
+
+      if (!raw) {
+        gbField.textContent = "–";
+        hint.textContent = "Podaj kwotę abonamentu, aby zobaczyć wynik.";
+        return;
+      }
+
+      const normalized = raw.replace(",", ".");
+      const price = parseFloat(normalized);
+
+      if (Number.isNaN(price) || price <= 0) {
+        gbField.textContent = "błąd";
+        hint.textContent = "Upewnij się, że wpisujesz dodatnią kwotę w złotówkach.";
+        return;
+      }
+
+      const gb =
+        (price / (4.20196666666667 * 1.1) * (1 / 1.23) * 2 * 1000) / 1024;
+      const rounded = gb.toFixed(2).replace(".", ",");
+
+      gbField.textContent = `${rounded} GB`;
+      hint.textContent = "Wynik zaokrąglono do dwóch miejsc po przecinku.";
+    }
+
+    priceField.addEventListener("input", policzGB);
+    priceField.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        policzGB();
+      }
+    });
+    document.getElementById("calcBtn").addEventListener("click", policzGB);
+  </script>
+</body>
+</html>
