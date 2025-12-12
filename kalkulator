@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plush kalkulator GB z abonamentu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --plush-green: #8fe000;
+      --plush-green-dark: #5bb200;
+      --plush-bg: #101118;
+      --plush-card: #181926;
+      --plush-text: #f7f7ff;
+      --plush-muted: #a7adc5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #262742 0, #050510 55%);
+      color: var(--plush-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 12px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #1b1d2a, #121320);
+      border-radius: 24px;
+      max-width: 480px;
+      width: 100%;
+      padding: 24px 20px 22px;
+      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(143, 224, 0, 0.28);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #ffffff 0, #f5ffe3 40%, #8fe000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 22px;
+      color: #222;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--plush-muted);
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(3, 4, 10, 0.85);
+      color: var(--plush-text);
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    input[type="text"]::placeholder {
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--plush-green);
+      box-shadow: 0 0 0 1px rgba(143, 224, 0, 0.7);
+      background: rgba(8, 10, 24, 0.95);
+    }
+
+    .suffix {
+      font-size: 14px;
+      color: var(--plush-muted);
+      padding-right: 4px;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      background: var(--plush-green);
+      color: #151515;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 4px 0 16px;
+      box-shadow: 0 10px 22px rgba(143, 224, 0, 0.3);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+        background 0.08s;
+    }
+
+    button:hover {
+      background: var(--plush-green-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 26px rgba(143, 224, 0, 0.38);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+    }
+
+    .result {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .result span {
+      color: var(--plush-green);
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--plush-muted);
+      margin-bottom: 4px;
+    }
+
+    .formula {
+      font-size: 11px;
+      color: rgba(167, 173, 197, 0.8);
+      margin-top: 6px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(143, 224, 0, 0.55);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 8px;
+      color: var(--plush-green);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--plush-green);
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 20px 16px 18px;
+        border-radius: 20px;
+      }
+      h1 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <header class="header">
+      <div class="logo-badge">P</div>
+      <div>
+        <h1>Plush kalkulator GB</h1>
+        <div class="subtitle">
+          Sprawdź, ile GB przypada z Twojego abonamentu wg wytycznych UE.
+        </div>
+      </div>
+    </header>
+
+    <div class="badge">
+      <span class="badge-dot"></span>
+      <span>Dla ofert komórkowych – kwota brutto / mies.</span>
+    </div>
+
+    <label for="price">Wpisz cenę abonamentu</label>
+    <div class="input-row">
+      <input
+        id="price"
+        type="text"
+        inputmode="decimal"
+        placeholder="np. 24,00"
+      />
+      <div class="suffix">zł/mies.</div>
+    </div>
+
+    <button id="calcBtn" type="button">
+      Przelicz na GB
+      <span>🐻</span>
+    </button>
+
+    <p class="result" id="result">Liczba GB: <span>–</span></p>
+
+    <p class="hint" id="hint">
+      Podaj kwotę abonamentu, a miś Plush policzy szacunkową liczbę gigabajtów.
+    </p>
+
+    <p class="formula">
+      Wzór: GB = cena / (4,20196666666667 × 1,1) / 1,23 × 2 × 1000 / 1024
+    </p>
+  </main>
+
+  <script>
+    function policzGB() {
+      const field = document.getElementById("price");
+      const raw = field.value.trim();
+      const resultEl = document.getElementById("result").querySelector("span");
+      const hintEl = document.getElementById("hint");
+
+      if (!raw) {
+        resultEl.textContent = "–";
+        hintEl.textContent =
+          "Podaj kwotę abonamentu, a miś Plush policzy szacunkową liczbę gigabajtów.";
+        return;
+      }
+
+      const normalized = raw.replace(",", ".");
+      const price = parseFloat(normalized);
+
+      if (isNaN(price) || price <= 0) {
+        resultEl.textContent = "błąd";
+        hintEl.textContent = "Ups! Sprawdź, czy wpisałeś poprawną kwotę w złotówkach.";
+        return;
+      }
+
+      const gb =
+        (price / (4.20196666666667 * 1.1) / 1.23) * 2 * 1000 / 1024;
+
+      const gbRounded = gb.toFixed(2).replace(".", ",");
+
+      resultEl.textContent = gbRounded + " GB";
+      hintEl.textContent =
+        "To szacunkowa liczba GB wynikająca z kwoty abonamentu według wzoru UE.";
+    }
+
+    document.getElementById("calcBtn").addEventListener("click", policzGB);
+    document.getElementById("price").addEventListener("keyup", function (e) {
+      if (e.key === "Enter") {
+        policzGB();
+      }
+    });
+    document.getElementById("price").addEventListener("input", function () {
+      if (this.value.trim() === "") {
+        document.getElementById("result").querySelector("span").textContent = "–";
+        document.getElementById("hint").textContent =
+          "Podaj kwotę abonamentu, a miś Plush policzy szacunkową liczbę gigabajtów.";
+      } else {
+        policzGB();
+      }
+    });
+  </script>
+</body>
+</html>
